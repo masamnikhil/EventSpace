@@ -1,0 +1,41 @@
+spring:
+  application:
+    name : AUTH-SERVICE
+  datasource:
+    url : jdbc:mysql://localhost:3306/eventspace?createDatabaseIfNotExist=true
+    username : root
+    password : Nikhil@123
+    driver-class-name : com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto : create
+  #kafka configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: user-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+
+server:
+  port: 8081
+
+#eureka
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
+    IpAddress: 127.0.0.1
+
+
