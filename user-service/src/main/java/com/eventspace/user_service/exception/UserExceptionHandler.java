@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
-public class ExceptionHandler {
+public class UserExceptionHandler {
 
     private ResponseEntity<ExceptionResponse> handleEntityExistsError(EntityExistsException ex){
         ExceptionResponse response = ExceptionResponse.builder().message(ex.getMessage())

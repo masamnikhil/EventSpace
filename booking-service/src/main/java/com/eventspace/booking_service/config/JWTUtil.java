@@ -1,4 +1,4 @@
-package com.eventspace.auth_service.config;
+package com.eventspace.booking_service.config;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -17,13 +17,12 @@ public class JWTUtil {
 
     private static final long EXPIRATION_TIME_MS = 1000 * 60 * 60;
 
-    public String generateToken(String username, List<String> roles){
+    public String generateToken(String username){
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME_MS);
 
         return Jwts.builder()
                 .subject(username)
-                .claim("roles", roles)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(secretKey, SignatureAlgorithm.HS256)

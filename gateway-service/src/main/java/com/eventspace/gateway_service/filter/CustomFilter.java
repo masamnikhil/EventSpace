@@ -45,9 +45,8 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
                 if(!jwtUtil.validateToken(token))
                     return this.error(exchange, "Session Expired", HttpStatus.UNAUTHORIZED);
 
-                ServerHttpRequest serverHttpRequest = exchange.getRequest()
-                        .mutate().header("Authorization", headerValue).build();
-            return chain.filter(exchange.mutate().request(serverHttpRequest).build());
+
+                return chain.filter(exchange);
             }
             return chain.filter(exchange);
         };

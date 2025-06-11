@@ -37,7 +37,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public boolean updateName(String username) {
+    public boolean updateName(String name) {
         return false;
     }
 }

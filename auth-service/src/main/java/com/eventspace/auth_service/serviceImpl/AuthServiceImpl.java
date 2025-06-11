@@ -18,7 +18,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -69,7 +72,8 @@ public class AuthServiceImpl implements AuthService {
             throw new EntityNotFoundException("incorrect password");
         }
         Optional<User> user = authRepository.findByUsername(username);
-        String token = jwtUtil.generateToken(username);
+        List<String> roles = user.get().getRoles().stream().map(role -> role.toString()).collect(Collectors.toList());
+        String token = jwtUtil.generateToken(username, roles);
         return userDtoMapper(user.get(), token);
     }
 
