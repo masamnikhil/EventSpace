@@ -54,7 +54,7 @@ public class BookingServiceImpl implements BookingService {
     private boolean isVenueAvailableTimeOverlap(LocalTime availableFrom, LocalTime availableTo, LocalTime startTime, LocalTime endTime) {
 
         if (availableTo.equals(LocalTime.MIDNIGHT)) {
-            availableTo = LocalTime.MAX; // 23:59:59.999...
+            availableTo = LocalTime.MAX; 
         }
 
         if (startTime.isBefore(availableFrom) || endTime.isAfter(availableTo) || !startTime.isBefore(endTime)) {
