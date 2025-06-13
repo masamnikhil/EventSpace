@@ -31,13 +31,15 @@ public class BookingServiceImpl implements BookingService {
        boolean isAvailable = isVenueAvailable(booking.getVenueId(), booking.getBookingDate()
                , booking.getStartTime(), booking.getEndTime());
         VenueResponseDto venueResponse = venueClient.getVenueInfo(booking.getVenueId());
-        boolean isOpenTiming = isVenueAvailableTime(venueResponse.getAvailableFrom(), venueResponse.getAvailableTo(), booking.getStartTime(), booking.getEndTime());
+        boolean isTimeOverlap = isVenueAvailableTimeOverlap(venueResponse.getAvailableFrom(), venueResponse.getAvailableTo(), booking.getStartTime(), booking.getEndTime());
+
+        if(isTimeOverlap)
+            throw new VenueNotAvailableException("venue will be closed.");
 
        if(!isAvailable){
            throw new VenueAlreadyBookedException("venue already booked");
        }
-       if(!isOpenTiming)
-           throw new VenueNotAvailableException("venue will be closed.");
+
        try {
            booking.setStatus(Status.CONFIRMED);
            Booking booking1 = bookingRepository.save(booking);
@@ -49,12 +51,17 @@ public class BookingServiceImpl implements BookingService {
        }
     }
 
-    private boolean isVenueAvailableTime(LocalTime availableFrom, LocalTime availableTo, LocalTime startTime, LocalTime endTime) {
+    private boolean isVenueAvailableTimeOverlap(LocalTime availableFrom, LocalTime availableTo, LocalTime startTime, LocalTime endTime) {
 
-        if(startTime.isBefore(availableFrom) && endTime.isAfter(availableTo))
-            return false;
-        else
+        if (availableTo.equals(LocalTime.MIDNIGHT)) {
+            availableTo = LocalTime.MAX; // 23:59:59.999...
+        }
+
+        if (startTime.isBefore(availableFrom) || endTime.isAfter(availableTo) || !startTime.isBefore(endTime)) {
             return true;
+        }
+        else
+            return false;
     }
 
 
@@ -69,12 +76,17 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private boolean isVenueAvailable(Long venueId, LocalDate bookingDate, LocalTime requestedStartTime, LocalTime requestedEndTime){
+
+        LocalTime bufferedStart = requestedStartTime.minusMinutes(30);
+        LocalTime bufferedEnd = requestedEndTime.plusMinutes(30);
+
         Optional<List<Booking>> bookings = bookingRepository.findByVenueIdAndBookingDateAndStatus(venueId, bookingDate, Status.CONFIRMED);
-        List<Booking> bookingList= bookings.get().stream().filter(booking -> !requestedStartTime.isAfter(booking.getEndTime()) && !booking.getStartTime().isAfter(requestedEndTime))
+        List<Booking> overlappingBookings = bookings.get().stream().filter(booking ->
+                requestedStartTime.isBefore(booking.getEndTime()) &&
+                        booking.getStartTime().isBefore(requestedEndTime))
                 .collect(Collectors.toList());
-        if(bookingList.isEmpty())
-            return true;
-        return false;
+
+        return overlappingBookings.isEmpty();
     }
 
     @Override

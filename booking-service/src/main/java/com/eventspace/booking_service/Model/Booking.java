@@ -23,7 +23,7 @@ public class Booking {
     private Long venueId;
     @Column(nullable = false, updatable = false)
     private Long userId;
-    @JsonFormat(pattern = "yyyy/MM/dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate bookingDate;
     @Column(nullable = false, updatable = false)
     @JsonFormat(pattern = "HH:mm")
